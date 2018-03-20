@@ -2,7 +2,9 @@
 shell script (and in fact is literally a smarter Haskell
 reimplementation of what I used to do using shell scripts.) It's
 designed to do what I want, and very likely doesn't do what you want
-(or does it poorly or buggily.)
+(or does it poorly or buggily.) You might want to look at
+[hi](https://github.com/fujimura/hi), a very similar and much more
+full-featured tool!
 
 The *charter* tool is a tool for setting up Haskell projects. It has
 three basic modes of operation which correspond to three kinds of
@@ -46,7 +48,7 @@ Create a simple executable `cat` that depends on `text`, and has a
 filled-in category and synopsis
 
 ```bash
-$ charter quick haskat \
+$ charter quick haskcat \
     -a text \
     -s 'The Haskcat program'
     -d 'Probably a pure Haskell implementation of cat, I guess?'
