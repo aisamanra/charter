@@ -19,6 +19,7 @@ data Option
   | SetRoot T.Text
   | AddDep T.Text
   | AddUsualDeps
+  | AddMod T.Text
     deriving (Eq, Show)
 
 options :: [Opt.OptDescr Option]
@@ -26,6 +27,9 @@ options =
   [ Opt.Option ['b'] ["bin"]
     (Opt.ReqArg (AddBinary . T.pack) "PROGRAM NAME")
     "Add another binary target to this Cabal file"
+  , Opt.Option ['m'] ["module"]
+    (Opt.ReqArg (AddMod . T.pack) "MODULE NAME")
+    "Add another library module to this Cabal file"
   , Opt.Option ['r'] ["root"]
     (Opt.ReqArg (SetRoot . T.pack) "DIRECTORY")
     "Set the root directory for this project"
@@ -62,6 +66,8 @@ process opts p = foldr ($) p (map go opts)
   where
     go (AddBinary n) proj =
       proj & C.binDetails %~ (C.mkBinary n :)
+    go (AddMod m) proj =
+      proj & C.libDetails %~ fmap (& C.libMods %~ (m :))
     go (SetCategory s) proj =
       proj & C.projectDetails . C.projectCategory .~ Just s
     go (SetSynopsis s) proj =

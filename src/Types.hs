@@ -17,8 +17,8 @@ data ProjectDetails = ProjectDetails
   }
 
 data LibraryDetails = LibraryDetails
-  { _libExposedModules :: [T.Text]
-  , _libDeps           :: [T.Text]
+  { _libMods :: [T.Text]
+  , _libDeps :: [T.Text]
   }
 
 data ExecutableDetails = ExecutableDetails

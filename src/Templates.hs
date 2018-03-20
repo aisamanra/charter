@@ -42,7 +42,7 @@ cabalLibrary lib = T.unlines $
   , "  default-extensions: ScopedTypeVariables"
   ] <> mods
   where
-    mods = case lib^.libExposedModules of
+    mods = case lib^.libMods of
              []     -> []
              (x:xs) ->
                ("  exposed-modules: " <> x) :

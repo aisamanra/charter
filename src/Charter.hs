@@ -35,9 +35,9 @@ mkBinary n = ExecutableDetails
   , _execDeps = []
   }
 
-mkLibrary :: T.Text -> LibraryDetails
-mkLibrary n = LibraryDetails
-  { _libExposedModules = [capitalize n]
+mkLibrary :: LibraryDetails
+mkLibrary = LibraryDetails
+  { _libMods = []
   , _libDeps = []
   }
 
@@ -59,8 +59,8 @@ projectBin :: ProjectDetails -> Project
 projectBin deets =
   mkProject deets & binDetails .~ [ bin ]
                   & libDetails .~ Just lib
-  where bin = mkBinary name & execDeps .~ ["name"]
-        lib = mkLibrary name
+  where bin = mkBinary name & execDeps .~ [name]
+        lib = mkLibrary & libMods .~ [capitalize name]
         name = deets^.projectName
 
 usualDeps :: [T.Text]
@@ -73,9 +73,7 @@ usualDeps =
 
 library :: ProjectDetails -> Project
 library deets =
-  mkProject deets & libDetails .~ Just lib
-  where
-    lib = mkLibrary (deets^.projectName)
+  mkProject deets & libDetails .~ Just mkLibrary
 
 mkdirBase :: T.Text -> [T.Text] -> IO ()
 mkdirBase base fp = do
@@ -128,9 +126,10 @@ createProject pr = do
   case (pr^.libDetails) of
     Nothing -> return ()
     Just lib -> do
-      forM_ (lib^.libExposedModules) $ \ m -> do
-        let modPath = "src" : T.splitOn "." (m <> ".hs")
-        write modPath (defaultLib m)
+      forM_ (lib^.libMods) $ \ m -> do
+        let modPath = "src" : T.splitOn "." m
+            modPath' = init modPath ++ [last modPath <> ".hs"]
+        write modPath' (defaultLib m)
 
   forM_ (pr^.binDetails) $ \e -> do
     write [e^.execDir, "Main.hs"] defaultBin
