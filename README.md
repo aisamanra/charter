@@ -50,7 +50,7 @@ filled-in category and synopsis
 ```bash
 $ charter quick haskcat \
     -a text \
-    -s 'The Haskcat program'
+    -s 'The Haskcat program' \
     -d 'Probably a pure Haskell implementation of cat, I guess?'
 ```
 
@@ -60,10 +60,10 @@ create three executables as well:
 
 ```bash
 $ charter library make-it-so \
-    -m Web.Make.It.So
-    -a warp
-    -a wai
-    -b do-this
-    -b do-that
+    -m Web.Make.It.So \
+    -a warp \
+    -a wai \
+    -b do-this \
+    -b do-that \
     -b do-the-other
 ```
