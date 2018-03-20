@@ -1,3 +1,7 @@
+# charter
+
+![stability: experimental](https://img.shields.io/badge/stability-experimental-red.svg)
+
 **Potential users beware!** This is basically a glorified personal
 shell script (and in fact is literally a smarter Haskell
 reimplementation of what I used to do using shell scripts.) It's
