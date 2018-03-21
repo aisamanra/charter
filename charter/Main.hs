@@ -17,10 +17,10 @@ data Option
   | SetDescription T.Text
   | SetLicense T.Text
   | SetRoot T.Text
+  | AddMod T.Text
   | AddDep T.Text
   | AddUsualDeps
-  | AddMod T.Text
-    deriving (Eq, Show)
+    deriving (Eq, Show, Ord)
 
 options :: [Opt.OptDescr Option]
 options =
@@ -62,7 +62,7 @@ usageInfo = Opt.usageInfo header options
 
 
 process :: [Option] -> C.Project -> C.Project
-process opts p = foldr ($) p (map go opts)
+process opts p = foldl (flip ($)) p (map go opts)
   where
     go (AddBinary n) proj =
       proj & C.binDetails %~ (C.mkBinary n :)
