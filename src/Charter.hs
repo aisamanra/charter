@@ -7,6 +7,8 @@ module Charter
 , quickBin
 , library
 
+, validLicenses
+
 , mkBinary
 , projectDefaults
 , createProject
@@ -139,3 +141,15 @@ createProject pr = do
   _ <- Proc.withCreateProcess pr (\_ _ _ -> Proc.waitForProcess)
   write [".gitignore"] defaultGitignore
   return ()
+
+
+validLicenses :: [T.Text]
+validLicenses =
+  [ "GPL", "AGPL", "LGPL",
+    "BSD2", "BSD3", "BSD4",
+    "MIT", "ISC", "MPL",
+    "Apache", "PublicDomain",
+    "AllRightsReserved",
+    "UnspecifiedLicense",
+    "OtherLicense"
+  ]

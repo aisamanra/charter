@@ -61,29 +61,36 @@ usageInfo = Opt.usageInfo header options
   where header = "Usage: charter (quick|executable|library) [name]"
 
 
-process :: [Option] -> C.Project -> C.Project
-process opts p = foldl (flip ($)) p (map go opts)
+process :: [Option] -> C.Project -> Either String C.Project
+process opts p = foldl (>>=) (return p) (map go opts)
   where
     go (AddBinary n) proj =
-      proj & C.binDetails %~ (C.mkBinary n :)
+      return $ proj & C.binDetails %~ (C.mkBinary n :)
     go (AddMod m) proj =
-      proj & C.libDetails %~ fmap (& C.libMods %~ (m :))
+      return $ proj & C.libDetails %~ fmap (& C.libMods %~ (m :))
     go (SetCategory s) proj =
-      proj & C.projectDetails . C.projectCategory .~ Just s
+      return $ proj & C.projectDetails . C.projectCategory .~ Just s
     go (SetSynopsis s) proj =
-      proj & C.projectDetails . C.projectSynopsis .~ Just s
+      return $ proj & C.projectDetails . C.projectSynopsis .~ Just s
     go (SetDescription s) proj =
-      proj & C.projectDetails . C.projectDescription .~ Just s
-    go (SetLicense s) proj =
-      proj & C.projectDetails . C.projectLicense .~ Just s
-    go (SetRoot _) proj = proj
+      return $ proj & C.projectDetails . C.projectDescription .~ Just s
+    go (SetLicense license) proj
+      | not (license `elem` C.validLicenses) =
+        Left $ concat [ "Unknown license: `"
+                      , T.unpack license
+                      , "'\n\nValid Cabal licenses include:\n  - "
+                      , T.unpack (T.intercalate "\n  - " C.validLicenses)
+                      ]
+      | otherwise =
+        return $ proj & C.projectDetails . C.projectLicense .~ Just license
+    go (SetRoot _) proj = return proj
 
     go (AddDep dep) proj =
-      proj & C.binDetails %~ fmap (& C.execDeps %~ (dep :))
-           & C.libDetails %~ fmap (& C.libDeps %~ (dep :))
+      return $ proj & C.binDetails %~ fmap (& C.execDeps %~ (dep :))
+                    & C.libDetails %~ fmap (& C.libDeps %~ (dep :))
     go (AddUsualDeps) proj =
-      proj & C.binDetails %~ fmap (& C.execDeps %~ (C.usualDeps ++))
-           & C.libDetails %~ fmap (& C.libDeps %~ (C.usualDeps ++))
+      return $ proj & C.binDetails %~ fmap (& C.execDeps %~ (C.usualDeps ++))
+                    & C.libDetails %~ fmap (& C.libDeps %~ (C.usualDeps ++))
 
 setupProject :: String -> String -> IO C.Project
 setupProject typ name = do
@@ -100,7 +107,9 @@ main = do
   case Opt.getOpt Opt.Permute options args of
     (os, [typ, name], []) -> do
       proj <- process os <$> setupProject typ name
-      C.createProject proj
+      case proj of
+        Right p -> C.createProject p
+        Left err -> Sys.die err
     (_, _, errs) -> do
       mapM_ putStrLn errs
       Sys.die usageInfo
