@@ -79,6 +79,10 @@ defaultLib mod = T.unlines $
   , ") where"
   ]
 
+defaultTest :: T.Text -> T.Text
+defaultTest mod = T.unlines $
+  [ "module " <> mod <> "(main) where" ]
+
 defaultGitignore :: T.Text
 defaultGitignore = T.unlines
   [ "dist"

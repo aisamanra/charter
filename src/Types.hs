@@ -27,6 +27,12 @@ data ExecutableDetails = ExecutableDetails
   , _execDeps :: [T.Text]
   }
 
+data TestDetails = TestDetails
+  { _testName :: T.Text
+  , _testDir  :: T.Text
+  , _testDeps :: [T.Text]
+  }
+
 data Project = Project
   { _projectDetails :: ProjectDetails
   , _libDetails     :: Maybe LibraryDetails
@@ -37,4 +43,5 @@ data Project = Project
 Lens.makeLenses ''ProjectDetails
 Lens.makeLenses ''LibraryDetails
 Lens.makeLenses ''ExecutableDetails
+Lens.makeLenses ''TestDetails
 Lens.makeLenses ''Project
